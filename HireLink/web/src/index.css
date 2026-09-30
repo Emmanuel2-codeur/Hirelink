@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { @apply bg-alabaster text-graphite antialiased; }
+  html[lang='ar'] body { font-family: theme('fontFamily.arabic'); }
+  /* les icônes directionnelles se retournent en RTL */
+  [dir='rtl'] .rtl-flip { transform: scaleX(-1); }
+}

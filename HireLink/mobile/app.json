@@ -1,0 +1,1 @@
+{ "expo": { "name": "HireLink", "slug": "hirelink", "scheme": "hirelink", "version": "0.1.0", "orientation": "portrait", "userInterfaceStyle": "light", "plugins": ["expo-router"], "ios": { "supportsTablet": true }, "android": {} } }
