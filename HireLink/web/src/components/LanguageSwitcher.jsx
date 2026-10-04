@@ -4,13 +4,14 @@ import { LANGS } from '@/i18n';
 import { useAuth } from '@/context/AuthContext';
 
 export default function LanguageSwitcher({ className = '' }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { setLanguage } = useAuth();
   return (
-    <label className={`inline-flex items-center gap-1.5 text-sm ${className}`}>
-      <Globe size={16} />
+    <label className={`relative inline-flex min-h-11 items-center gap-1.5 text-sm font-medium ${className}`}>
+      <Globe size={16} aria-hidden="true" />
+      <span className="sr-only">{t('common.language')}</span>
       <select value={i18n.language} onChange={(e) => setLanguage(e.target.value)}
-        className="cursor-pointer rounded-md border-0 bg-transparent py-1 pe-6 ps-1 text-sm focus:ring-2 focus:ring-teal">
+        className="cursor-pointer appearance-none rounded-md bg-transparent py-2 pe-1 ps-0 text-sm font-medium focus:outline-none">
         {Object.entries(LANGS).map(([k, v]) => <option key={k} value={k} className="text-graphite">{v.label}</option>)}
       </select>
     </label>

@@ -23,6 +23,7 @@ export const api = {
   upload,
   get: (p) => request(p),
   post: (p, b) => request(p, { method: 'POST', body: b }),
+  delete: (p) => request(p, { method: 'DELETE' }),
   patch: (p, b) => request(p, { method: 'PATCH', body: b }),
   put: (p, b) => request(p, { method: 'PUT', body: b }),
 };

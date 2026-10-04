@@ -10,6 +10,7 @@ Format : succès `{ data, meta? }` · erreur `{ error: { code, message } }` · A
 | applications | `POST /applications`, `GET /applications/mine` (candidate) · `GET /applications/job/:jobId`, `PATCH /applications/:id/status` (recruteur) | — |
 | interviews / recruitments / documents / messages | `GET`, `POST` (CRUD de base) | connecté |
 | companies / recruiters | `GET /companies/mine`, `POST /companies`, `GET /recruiters/me` | recruteur |
+| conversations | `GET /conversations`, `POST /conversations {application_id}`, `GET/POST /conversations/:id/messages`, `PATCH /conversations/:id/read` | participants de la candidature |
 | notifications | `GET /notifications`, `PATCH /notifications/:id/read` | connecté |
 | ai | `POST /ai/chat`, `POST /ai/analyze-cv` | connecté |
 | admin | `GET /admin/stats`, `GET /admin/companies/pending`, `PATCH /admin/companies/:id`, `GET /admin/audit-logs` | admin |

@@ -3,8 +3,29 @@
 @tailwind utilities;
 
 @layer base {
-  html { @apply bg-alabaster text-graphite antialiased; }
+  html { @apply scroll-smooth bg-alabaster text-graphite antialiased; }
+  body { @apply text-base leading-relaxed; }
+  h1, h2, h3 { @apply text-ink; text-wrap: balance; }
   html[lang='ar'] body { font-family: theme('fontFamily.arabic'); }
-  /* les icônes directionnelles se retournent en RTL */
+  :focus-visible { outline: 2px solid theme('colors.teal.DEFAULT'); outline-offset: 2px; border-radius: 6px; }
   [dir='rtl'] .rtl-flip { transform: scaleX(-1); }
+  button, [role='button'], a, select, summary { cursor: pointer; touch-action: manipulation; }
+  button:disabled { cursor: not-allowed; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  }
 }
+
+@layer components {
+  /* Champs de formulaire : 44 px de haut, 16 px (évite le zoom iOS), focus visible */
+  .input { @apply block min-h-11 w-full rounded-lg border border-line bg-white px-3 py-2 text-base text-ink transition-colors placeholder:text-muted/70 hover:border-yale/40 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/40 disabled:bg-alabaster disabled:text-muted; }
+  .label { @apply mb-1.5 block text-sm font-medium text-ink; }
+  .hint { @apply mt-1 text-sm text-muted; }
+  .skeleton { @apply animate-pulse rounded-md bg-alabaster-200/80; }
+  /* Fondu de la photo d'accueil vers le texte (inversé en RTL) */
+  .hero-fade { -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 42%); mask-image: linear-gradient(to right, transparent 0%, #000 42%); }
+  [dir='rtl'] .hero-fade { -webkit-mask-image: linear-gradient(to left, transparent 0%, #000 42%); mask-image: linear-gradient(to left, transparent 0%, #000 42%); }
+  /* Unique animation d'entrée de la page d'accueil */
+  .rise { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0ms); }
+}
+@keyframes rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }

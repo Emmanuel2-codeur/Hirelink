@@ -138,8 +138,8 @@ create table public.ai_conversations (id uuid primary key default gen_random_uui
 create table public.ai_messages (id uuid primary key default gen_random_uuid(), conversation_id uuid not null references public.ai_conversations(id) on delete cascade, role text not null check (role in ('user','assistant')), content text not null, created_at timestamptz not null default now());
 
 -- ===== Communication
-create table public.conversations (id uuid primary key default gen_random_uuid(), created_at timestamptz not null default now());
-create table public.conversation_members (conversation_id uuid references public.conversations(id) on delete cascade, user_id uuid references public.profiles(id) on delete cascade, primary key (conversation_id, user_id));
+create table public.conversations (id uuid primary key default gen_random_uuid(), application_id uuid unique references public.applications(id) on delete cascade, last_message_at timestamptz, created_at timestamptz not null default now());
+create table public.conversation_members (conversation_id uuid references public.conversations(id) on delete cascade, user_id uuid references public.profiles(id) on delete cascade, last_read_at timestamptz not null default now(), primary key (conversation_id, user_id));
 create table public.messages (id uuid primary key default gen_random_uuid(), conversation_id uuid references public.conversations(id) on delete cascade, sender_id uuid not null references public.profiles(id) on delete cascade, body text not null, created_at timestamptz not null default now());
 create table public.notifications (id uuid primary key default gen_random_uuid(), user_id uuid not null references public.profiles(id) on delete cascade, type text not null, title text, body text, data jsonb, read boolean not null default false, created_at timestamptz not null default now());
 
@@ -148,6 +148,7 @@ create table public.document_templates (id uuid primary key default gen_random_u
 create table public.documents (
   id uuid primary key default gen_random_uuid(),
   owner_id uuid not null references public.profiles(id) on delete cascade,
+  recipient_id uuid references public.profiles(id) on delete set null,
   kind text not null check (kind in ('work_contract','internship_contract','internship_agreement','attestation','certificate','letter','other')),
   title text, language lang_code not null default 'fr', file_url text, data jsonb,
   created_at timestamptz not null default now()
@@ -157,3 +158,4 @@ create table public.documents (
 create table public.reports (id uuid primary key default gen_random_uuid(), reporter_id uuid references public.profiles(id) on delete set null, entity text, entity_id uuid, reason text, status text default 'open', created_at timestamptz not null default now());
 create table public.audit_logs (id uuid primary key default gen_random_uuid(), actor_id uuid references public.profiles(id) on delete set null, action text not null, entity text, entity_id uuid, meta jsonb, created_at timestamptz not null default now());
 create table public.platform_settings (key text primary key, value jsonb not null);
+create index on public.messages (conversation_id, created_at);

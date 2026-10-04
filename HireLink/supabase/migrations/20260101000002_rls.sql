@@ -60,11 +60,14 @@ create policy "ia-conv: propriétaire" on public.ai_conversations for all using 
 create policy "ia-msg: propriétaire" on public.ai_messages for all using (exists (select 1 from public.ai_conversations c where c.id = conversation_id and c.user_id = auth.uid()));
 create policy "notif: propriétaire" on public.notifications for all using (user_id = auth.uid());
 create policy "docs: propriétaire/admin" on public.documents for all using (owner_id = auth.uid() or public.is_admin());
+create policy "docs: destinataire lit" on public.documents for select using (recipient_id = auth.uid());
 create policy "tpl: lecture" on public.document_templates for select using (auth.role() = 'authenticated');
 create policy "conv: membres" on public.conversations for select using (exists (select 1 from public.conversation_members m where m.conversation_id = id and m.user_id = auth.uid()));
 create policy "conv-membres: soi" on public.conversation_members for select using (user_id = auth.uid());
 create policy "msg: membres lisent" on public.messages for select using (exists (select 1 from public.conversation_members m where m.conversation_id = messages.conversation_id and m.user_id = auth.uid()));
-create policy "msg: membres écrivent" on public.messages for insert with check (sender_id = auth.uid());
+create policy "msg: membres écrivent" on public.messages for insert with check (
+  sender_id = auth.uid()
+  and exists (select 1 from public.conversation_members m where m.conversation_id = messages.conversation_id and m.user_id = auth.uid()));
 create policy "skills: lecture" on public.skills for select using (true);
 
 -- admin

@@ -7,9 +7,11 @@ import Login from '@/pages/Login';
 import CandidateDashboard from '@/pages/CandidateDashboard';
 import RecruiterDashboard from '@/pages/RecruiterDashboard';
 import NewOffer from '@/pages/NewOffer';
-import AdminConsole from '@/pages/AdminConsole';
+import AdminConsole from '@/pages/AdminLive';
 import Jobs from '@/pages/Jobs';
 import Interviews from '@/pages/Interviews';
+import Documents from '@/pages/Documents';
+import Messages from '@/pages/Messages';
 import CandidateProfile from '@/pages/CandidateProfile';
 
 const Home = () => {
@@ -30,6 +32,8 @@ export default function App() {
           <Route path="candidate" element={<CandidateDashboard />} />
           <Route path="jobs" element={<Jobs />} />
           <Route path="interviews" element={<Interviews />} />
+          <Route path="documents" element={<Documents />} />
+          <Route path="messages" element={<Messages />} />
           <Route path="profile" element={<CandidateProfile />} />
           <Route element={<RequireAuth roles={['recruiter', 'company', 'admin']} />}>
             <Route path="recruiter" element={<RecruiterDashboard />} />

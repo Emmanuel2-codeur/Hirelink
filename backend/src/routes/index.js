@@ -8,6 +8,8 @@ import { ownedCrud } from '../controllers/generic.controller.js';
 import * as jobs from '../controllers/jobs.controller.js';
 import * as apps from '../controllers/applications.controller.js';
 import * as m from '../controllers/misc.controller.js';
+import * as chat from '../controllers/messaging.controller.js';
+import * as docs from '../controllers/documents.controller.js';
 import * as iv from '../controllers/interviews.controller.js';
 import * as cand from '../controllers/candidates.controller.js';
 import multer from 'multer';
@@ -86,15 +88,31 @@ const interviewBody = z.object({
 r.get('/interviews', auth, h(iv.list));
 r.post('/interviews', auth, recruiter, validate(interviewBody), h(iv.create));
 r.patch('/interviews/:id/status', auth, recruiter, validate(statusBody(['scheduled', 'done', 'cancelled'])), h(iv.setStatus));
-const documents = ownedCrud('documents', 'owner_id');
-r.get('/documents', auth, h(documents.list));
-r.post('/documents', auth, h(documents.create));
+const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional();
+const short = (n) => z.string().trim().max(n).optional();
+const docBody = z.object({
+  application_id: z.string().uuid(),
+  kind: z.enum(['work_contract', 'internship_agreement', 'attestation']),
+  language: z.enum(['fr', 'en', 'ar']).default('fr'),
+  fields: z.object({
+    start_date: date, end_date: date, salary: short(200), workplace: short(200), mission: short(1000),
+    signatory_name: short(120), signatory_title: short(120), notes: short(1500),
+  }).default({}),
+});
+r.get('/documents', auth, h(docs.list));
+r.post('/documents/generate', auth, recruiter, validate(docBody), h(docs.generate));
+r.get('/documents/:id/html', auth, h(docs.html));
+r.delete('/documents/:id', auth, recruiter, h(docs.remove));
 const recruitments = ownedCrud('recruitments', 'created_by');
 r.get('/recruitments', auth, recruiter, h(recruitments.list));
 r.post('/recruitments', auth, recruiter, h(recruitments.create));
-const messages = ownedCrud('messages', 'sender_id');
-r.get('/messages', auth, h(messages.list));
-r.post('/messages', auth, h(messages.create));
+// ---------- messagerie (une conversation par candidature)
+const msgLimiter = rateLimit({ windowMs: 60_000, limit: 40, standardHeaders: true, legacyHeaders: false, message: { error: { code: 'RATE_LIMIT', message: 'Trop de messages, patientez un instant' } } });
+r.get('/conversations', auth, h(chat.list));
+r.post('/conversations', auth, validate(z.object({ application_id: z.string().uuid() })), h(chat.open));
+r.get('/conversations/:id/messages', auth, h(chat.messages));
+r.post('/conversations/:id/messages', auth, msgLimiter, validate(z.object({ body: z.string().trim().min(1).max(2000) })), h(chat.send));
+r.patch('/conversations/:id/read', auth, h(chat.read));
 
 // ---------- /api/companies & /api/recruiters
 const companyBody = z.object({
